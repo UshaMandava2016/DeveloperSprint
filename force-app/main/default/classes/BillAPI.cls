@@ -9,21 +9,22 @@ public with sharing class BillAPI {
         //set up an Http object and an HTTPResponse Object and use the .getBody() method here.
         Http http = new Http();
         HTTPResponse res = http.send(req);
-        System.debug(res.getBody());
+        String responseBody=res.getBody();
+        //System.debug(res.getBody());
 
         //Use the following to deserialize the JSON response into a wrapper class:
 
         List<BillWrapper> bwList = (List<BillWrapper>)JSON.deserialize(responseBody, List<BillWrapper>.class);
         //create a list of bills to insert
         List<Bill__c> billsToInsert = new List<Bill__c>();
-        List<BillWrapper> billWrappers = getBillWrappers();
+        //List<BillWrapper> billWrappers = getBillWrappers();
         Map<String, Id> accountNameToIdMap = new Map<String, Id>();
         //query for active accounts (Active__c = 'Yes')
         for(Account account : [ SELECT Id, Name FROM Account WHERE Active__c= 'Yes' ]) {
         //create an active account map in the form of Map<String, Id>
         accountNameToIdMap.put(account.Name, account.Id);
         }
-        for(BillWrapper billWrapper : billWrappers) {
+        for(BillWrapper billWrapper : bwList) {
             Bill__c billToInsert = new Bill__c();
             billToInsert.Bill_Id__c = billWrapper.billId;
             billToInsert.Balance__c = Decimal.valueOf(billWrapper.balance.replace('$', ''));
@@ -32,8 +33,8 @@ public with sharing class BillAPI {
     }
 
     
-    insert billsToInsert;
-    return [SELECT Id, Bill_Id__c, Balance__c, Account__r.Name FROM Bill__c WHERE Id IN :billsToInsert];
+        insert billsToInsert;
+        return [SELECT Id, Bill_Id__c, Balance__c, Account__r.Name FROM Bill__c WHERE Id IN :billsToInsert];
 }
 
         
