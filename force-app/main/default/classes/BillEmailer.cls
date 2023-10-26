@@ -2,7 +2,7 @@ public with sharing class BillEmailer {
     
     public static void sendEmails(Map<String, Blob> emailsWithBills) {
         //instantiate a list of Messaging.SingleEmailMessage objects
-
+        List<Messaging.SingleEmailMessage> mail=new List<Messaging.SingleEmailMessage>();
 
 
         //iterate over the keyset of the emailsWithBills map and instantiate a single Messaging.SingleEmailMessage
@@ -10,21 +10,28 @@ public with sharing class BillEmailer {
         //Messaging.SingleEmailMessage object.
 
         for(String email : emailsWithBills.keySet()) {
-
+            //system.debug(emailsWithBills.KeySet());
+            Messaging.SingleEmailMessage message=new Messaging.SingleEmailMessage();
+            message.setBccAddresses(new string[]{email});
+            message.setPlainTextBody('Attached PDF is recent bill from Cricket Wireless:');
+            message.setSubject('Your Bill Details from Cricket Wireless');
             //use the following
             //to attach the PDF blob to the email:
             Messaging.EmailFileAttachment attach = new Messaging.EmailFileAttachment();
+            if(!emailsWithBills.isEmpty())
+            {
             attach.Body = emailsWithBills.get(email);
+            }
             attach.FileName = 'Bill-' + Date.Today().Month() + '-' + Date.Today().Day() + '-' + Date.Today().Year() + '.pdf';
             attach.ContentType = 'application/pdf';
 
-            mail.setFileAttachments(new Messaging.EmailFileAttachment[]{attach});
+            message.setFileAttachments(new Messaging.EmailFileAttachment[]{attach});
 
             //add the Messaging.SingleEmailMessage object to the list inside of the loop, and send the email outside of the loop.
-
+            mail.add(message);
         }
 
-        Messaging.SendEmailResult[] results = Messaging.sendEmail(emailsToSend);
+        Messaging.SendEmailResult[] results = Messaging.sendEmail(mail);
         // Call a helper method to inspect the returned results
         inspectResults(results);
     }

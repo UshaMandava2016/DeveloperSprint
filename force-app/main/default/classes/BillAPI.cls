@@ -20,24 +20,28 @@ public with sharing class BillAPI {
         //List<BillWrapper> billWrappers = getBillWrappers();
         Map<String, Id> accountNameToIdMap = new Map<String, Id>();
         //query for active accounts (Active__c = 'Yes')
-        for(Account account : [ SELECT Id, Name FROM Account WHERE Active__c= 'Yes' ]) {
+        //if (Schema.sObjectType.Account.fields.Active__c.isAccessible()){
+        for(Account account : [ SELECT Id, Name FROM Account WHERE Active__c= 'Yes' WITH SECURITY_ENFORCED ] ) {
         //create an active account map in the form of Map<String, Id>
         accountNameToIdMap.put(account.Name, account.Id);
+        //}
         }
-        for(BillWrapper billWrapper : bwList) {
-            Bill__c billToInsert = new Bill__c();
-            billToInsert.Bill_Id__c = billWrapper.billId;
-            billToInsert.Balance__c = Decimal.valueOf(billWrapper.balance.replace('$', ''));
-            billToInsert.Account__c = accountNameToIdMap.get(billWrapper.accountName);
-            billsToInsert.add(billToInsert);
-    }
-
-    
+        if(bwList.size()>0)
+        {
+            for(BillWrapper billWrapper : bwList) {
+                Bill__c billToInsert = new Bill__c();
+                billToInsert.Bill_Id__c = billWrapper.billId;
+                billToInsert.Balance__c = Decimal.valueOf(billWrapper.balance.replace('$', ''));
+                billToInsert.Account__c = accountNameToIdMap.get(billWrapper.accountName);
+                billsToInsert.add(billToInsert);
+            }
+        }    
+        //if (Schema.sObjectType.Bill__c.isCreatable()){
         insert billsToInsert;
-        return [SELECT Id, Bill_Id__c, Balance__c, Account__r.Name FROM Bill__c WHERE Id IN :billsToInsert];
-}
-
+        //}
+        return [SELECT Id, Bill_Id__c, Balance__c, Account__r.Name FROM Bill__c WHERE Id IN :billsToInsert WITH SECURITY_ENFORCED];
         
+}      
         //iterate over the list of active accounts, and use the .put() method of the Map class
         // to insert the account name and Id as the key value pair.
         //https://developer.salesforce.com/docs/atlas.en-us.apexref.meta/apexref/apex_methods_system_map.htm

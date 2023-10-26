@@ -1,6 +1,79 @@
-<apex:page>
-<!-- Begin Default Content REMOVE THIS -->
-<h1>Congratulations</h1>
-This is your new Page
-<!-- End Default Content REMOVE THIS -->
+<apex:page standardController="Bill__c" renderAs="pdf">
+    
+    <!--
+        The following outputTexts that are not rendered are used so that we
+        can access the values for the fields in a table per documentation here:
+        https://help.salesforce.com/s/articleView?id=000385722&type=1
+    -->
+    <!--
+    <apex:outputText value="{!Bill__c.Name}" rendered="false"/>
+    <apex:outputText value="{!Bill__c.Balance__c}" rendered="false"/>
+    <apex:outputText value="{!Bill__c.Bill_Id__c}" rendered="false"/>
+    -->
+    <!--
+        Because we are using the standard controller for the child object
+        we can access fields on the Parent object by utilizing the relationship
+        between the Bill__c and Account object, Account__r, as seen below:
+    -->
+    You are looking at the Most Recent Bill for {!Bill__c.Account__r.Name}.
+    <!--
+        The general format of fields on the Parent object will be:
+        ChildObject__c.ParentObject__r.FieldName__c
+
+        The general format of fields on the Child object will be:
+        ChildObject__c.FieldName__c
+    -->
+
+    <!--
+        Display information from the account here in an organized fasion,
+        such as  phone number, email address, billing address, and shipping address.
+
+        Hint: use apex:panelGrid and apex:PanelGroup to display this nicely.
+    -->
+    <apex:form>
+        <apex:pageBlock title="">
+            <apex:panelGrid style="width: 100%" columns="2" cellpadding="10">
+                <apex:panelGroup>
+                    <b>Email</b>
+                    <br/>
+                    <apex:outputText value="{!Bill__c.Account__r.Email__c}"/>   
+                </apex:panelGroup>
+                <apex:panelGroup>
+                    <b>Phone</b>
+                    <br/>
+                    <apex:outputText value="{!Bill__c.Account__r.Phone}"/>
+                </apex:panelGroup>
+                <apex:panelGroup>
+                    <b>Billing Address</b>
+                    <br/>
+                    <apex:outputText value="{!Bill__c.Account__r.BillingStreet}"/>
+                    <br/>
+                    <apex:outputText value="{!Bill__c.Account__r.BillingCity}"/>
+                </apex:panelGroup>
+                <apex:panelGroup >
+                    <b>Shipping Address</b>
+                    <br/>
+                    <apex:outputText value="{!Bill__c.Account__r.ShippingStreet}"/>
+                    <br/>
+                    <apex:outputText value="{!Bill__c.Account__r.ShippingCity}"/>
+                </apex:panelGroup>
+            </apex:panelGrid>
+        </apex:pageBlock>
+    
+
+
+    <!--
+        Build a table showing the Bill Summary (Bill Name, Bill Balance, and Bill Id) here.
+        Hint: use apex:pageBlockTable to display this in a table.
+    -->
+        
+        <apex:pageBlock title="Bill Summary">
+            <apex:pageBlockTable value="{!Bill__c}" var="bill" columns="3" style="width:100%">                 
+                <apex:column value="{!bill.Name}" headerValue="Bill Name" style="border: 2px solid black"/>
+                <apex:column value="{!bill.Balance__c}" headerValue="Bill Balance" style="border: 2px solid black"/>
+                <apex:column value="{!bill.Id}" headerValue="Bill Id" style="border: 2px solid black"/>
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+    
 </apex:page>
