@@ -3,17 +3,14 @@ public with sharing class BillAPI {
     public static List<Bill__c> getBills() {
         //start by creating an HttpRequest object and set the endpoint and method.
         HttpRequest req = new HttpRequest();
-        req.setEndpoint('https://my-json-server.typicode.com/grizzleevelyn/231017_dev_clicked/bills');
+        req.setEndpoint('callout:Billing_API');
         req.setMethod('GET');
-
         //set up an Http object and an HTTPResponse Object and use the .getBody() method here.
         Http http = new Http();
         HTTPResponse res = http.send(req);
         String responseBody=res.getBody();
         //System.debug(res.getBody());
-
         //Use the following to deserialize the JSON response into a wrapper class:
-
         List<BillWrapper> bwList = (List<BillWrapper>)JSON.deserialize(responseBody, List<BillWrapper>.class);
         //create a list of bills to insert
         List<Bill__c> billsToInsert = new List<Bill__c>();
@@ -60,24 +57,24 @@ public with sharing class BillAPI {
     
 
 
-    //this is what's known as a wrapper class. A wrapper class
-    //allows us to create an instance of a class with the properties
-    //we specify. In this case, we are creating a class that will hold
-    //the properties for the BillId, AccountName, and Balance, which will
-    //be populated from the JSON structure that is stored in our external
-    //data source. Once we get the body of our HTTP callout, we will use
-    //the following line of code to transform the response body (responseBody)
-    //into a list of instances of our wrapper class, BillWrapper:
-    //
-    //List<BillWrapper> bwList = (List<BillWrapper>)JSON.deserialize(responseBody, List<BillWrapper>.class);
-    //
-    //once we have a list of BillWrapper objects (bwList), we will iterate over the
-    //bwList, instantiate a new Bill__c object record, and assign the values of the
-    //BillWrapper properties to the fields on the Bill__c record.
+        //this is what's known as a wrapper class. A wrapper class
+        //allows us to create an instance of a class with the properties
+        //we specify. In this case, we are creating a class that will hold
+        //the properties for the BillId, AccountName, and Balance, which will
+        //be populated from the JSON structure that is stored in our external
+        //data source. Once we get the body of our HTTP callout, we will use
+        //the following line of code to transform the response body (responseBody)
+        //into a list of instances of our wrapper class, BillWrapper:
+        //
+        //List<BillWrapper> bwList = (List<BillWrapper>)JSON.deserialize(responseBody, List<BillWrapper>.class);
+        //
+        //once we have a list of BillWrapper objects (bwList), we will iterate over the
+        //bwList, instantiate a new Bill__c object record, and assign the values of the
+        //BillWrapper properties to the fields on the Bill__c record.
     
-    public class BillWrapper {
-        public String billId;
-        public String accountName;
-        public String balance;
-    }
+        public class BillWrapper {
+            public String billId;
+            public String accountName;
+            public String balance;
+        }
 }
