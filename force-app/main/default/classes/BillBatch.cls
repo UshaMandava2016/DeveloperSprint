@@ -30,7 +30,9 @@ public with sharing class BillBatch implements Database.Batchable<sObject>, Data
                 }
             }
             // Call the getBills method from BillAPI
+            if(!receivesBillByEmail.isEmpty()){
             BillAPI.getBills();
+            }
         }
  
     public void finish(Database.BatchableContext bc){
